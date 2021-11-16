@@ -1,0 +1,118 @@
+.slider {
+	width:    100%;
+	position: relative;
+	overflow: hidden;
+
+	&__wrapper {
+		display:  flex;
+		position: relative;
+		transition: all 0s linear;
+
+		& > * {
+			width: 100%;
+			flex:  1 0 auto;
+		}
+	}
+
+	&__btn {
+		display:         flex;
+		align-items:     center;
+		justify-content: center;
+		width:           48px;
+		height:          48px;
+		border-radius:   100%;
+		position:        absolute;
+		top:             50%;
+		transform:       translateY(-50%);
+		background:      #FFFFFF;
+		box-shadow:      0px 4px 10px rgba(0, 0, 0, .1);
+		transition:      all .2s ease;
+		cursor:          pointer;
+		z-index:         100;
+		border:          none;
+
+		svg path {
+			transition: all .2s ease;
+		}
+
+		&:hover {
+			width:      52px;
+			height:     52px;
+			box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+
+			svg path {
+				fill: #4E4E4E;
+			}
+		}
+
+		&_prev {
+			left: 12px;
+		}
+
+		&_next {
+			right: 12px;
+		}
+
+		&[disabled] {
+			background: #EEEEEE;
+
+			svg path {
+				fill: #8C8C8C;
+			}
+
+			&:hover {
+				width:      48px;
+				height:     48px;
+				box-shadow: 0px 4px 10px rgba(0, 0, 0, .1);
+				cursor:     auto;
+			}
+		}
+	}
+
+	&__dots {
+		position:        absolute;
+		bottom:          10px;
+		left:            50%;
+		transform:       translateX(-50%);
+		display:         flex;
+		align-items:     center;
+		justify-content: center;
+		margin:          0;
+		padding:         0;
+		list-style-type: none;
+		z-index:         100;
+	}
+
+	&__dots-item {
+		width:            12px;
+		height:           12px;
+		border-radius:    100%;
+		border:           1px solid #D9D9DA;
+		background-color: #fff;
+		margin:           0 4px;
+		cursor:           pointer;
+		transition:       all .2s ease;
+		display:          flex;
+		align-items:      center;
+		justify-content:  center;
+
+		&:before {
+			box-sizing:    border-box;
+			content:       '';
+			display:       block;
+			width:         100%;
+			height:        100%;
+			background:    transparent;
+			transition:    all .2s ease;
+			border-radius: 100%;
+			border:        2px solid #fff;
+		}
+
+		&:hover,
+		&.active {
+			&:before {
+				background: #F47021;
+			}
+		}
+	}
+}
