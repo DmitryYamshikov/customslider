@@ -11,20 +11,19 @@ export default class Slider extends Vue {
 	@Prop({default: true}) public slidesSwipe!: number;
 	@Prop({default: 0}) public marginBetweenSlides!: number;
 
-	public slidesCount     = 0;
-	public currentIndex    = 0;
-	public currentPosition = 0;
-	public sliderStep      = 0;
-	public eventClientX    = 0;
-	public posInStartEvent = 0;
-	public eventStatus     = false;
+	public slidesCount            = 0;
+	public currentIndex           = 0;
+	public currentPosition        = 0;
+	public sliderStep             = 0;
+	public eventClientX           = 0;
+	public posInStartEvent        = 0;
+	public eventStatus            = false;
+	public coordinatesXDifference = 0;
 
 	mounted(): void {
-
 		this.calcSliderStep();
 		this.init();
 		this.getSlidesCount();
-		// this.calcMaxSlidePosition();
 	}
 
 	//TODO slideNext, slidePrev, setSlide объеденить в одну перменную
@@ -36,14 +35,14 @@ export default class Slider extends Vue {
 	//TODO проверить на мобилке
 
 	public init() {
-		const slider: HTMLElement = <HTMLElement> this.$refs.slider;
-		slider.style.marginRight = `-${this.marginBetweenSlides}px`
+		const slider: HTMLElement = <HTMLElement>this.$refs.slider;
+		slider.style.marginRight  = `-${this.marginBetweenSlides}px`
 		Array.from(this.sliderWrapper.children).forEach((item: any, index: number) => {
 			const slide = document.createElement('div');
 			slide.classList.add('slider__slide-item');
 			slide.appendChild(item);
 			this.sliderWrapper.appendChild(slide);
-			slide.style.width = `calc(${100 / this.slidesToShow}% - ${this.marginBetweenSlides}px)`;
+			slide.style.width       = `calc(${100 / this.slidesToShow}% - ${this.marginBetweenSlides}px)`;
 			slide.style.marginRight = `${this.marginBetweenSlides}px`
 		})
 	}
@@ -64,7 +63,7 @@ export default class Slider extends Vue {
 	}
 
 	public get dotsCount(): number {
-		return Math.ceil(Math.abs(((this.slidesCount-this.slidesToShow)/this.slidesToScroll)+1))
+		return Math.ceil(Math.abs(((this.slidesCount - this.slidesToShow) / this.slidesToScroll) + 1))
 	}
 
 	public calcSliderStep() {
@@ -100,34 +99,41 @@ export default class Slider extends Vue {
 
 	public resetActions(event: any) {
 		this.eventStatus = false;
+
 		if (this.slidesSwipe) {
-			//TODO сделать округление в меньшую сторону
-			const index = Math.ceil(Math.abs(this.currentPosition / this.sliderStep))
-			this.setSlide(null, index)
+			if (this.coordinatesXDifference > 0) {
+				const index = Math.ceil(Math.abs(this.currentPosition / this.sliderStep));
+				this.setSlide(null, index);
+			}
+			else if (this.coordinatesXDifference < 0) {
+				const index = Math.ceil(Math.abs(this.currentPosition / this.sliderStep))-1;
+				this.setSlide(null, index);
+			}
 		}
+		this.coordinatesXDifference = 0;
 	}
 
 	public mouseDownHandler(event: any) {
 		this.sliderWrapper.classList.remove('anim')
-		this.eventClientX = event.clientX;
-		this.eventStatus  = true;
+		this.eventClientX    = event.clientX;
+		this.eventStatus     = true;
 		this.posInStartEvent = this.currentPosition;
 	}
 
 	public mouseMoveHandler(event: any) {
 		if (this.eventStatus) {
-			const diff        = this.eventClientX - event.clientX;
-			const newPosition = this.posInStartEvent + diff;
+			this.coordinatesXDifference = this.eventClientX - event.clientX;
+			const newPosition           = this.posInStartEvent + this.coordinatesXDifference;
 
 
-			if ((newPosition >= 0) && (newPosition <= this.sliderStep * (this.dotsCount - 1))) {
+			if ((newPosition >= 0) && (newPosition <= this.maxSlidePosition)) {
 				this.currentPosition = newPosition;
 				if (this.slidesSwipe) {
-					if ((diff >= 0) && ((this.sliderStep * 0.3) < Math.abs(diff))) {
+					if ((this.coordinatesXDifference >= 0) && ((this.sliderStep * 0.3) < Math.abs(this.coordinatesXDifference))) {
 						this.eventStatus = false;
 						this.slideNext();
 					}
-					if ((diff <= 0) && ((this.sliderStep * 0.3) < Math.abs(diff))) {
+					if ((this.coordinatesXDifference <= 0) && ((this.sliderStep * 0.3) < Math.abs(this.coordinatesXDifference))) {
 						this.eventStatus = false;
 						this.slidePrev();
 					}
