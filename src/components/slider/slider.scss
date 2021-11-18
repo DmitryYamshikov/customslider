@@ -1,16 +1,20 @@
 .slider {
 	width:    100%;
+	max-width: 100%;
 	position: relative;
 	overflow: hidden;
 
 	&__wrapper {
 		display:  flex;
 		position: relative;
-		transition: all 0s linear;
 
 		& > * {
 			width: 100%;
 			flex:  1 0 auto;
+		}
+
+		&.anim {
+			transition: all .3s linear;
 		}
 	}
 

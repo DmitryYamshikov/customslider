@@ -1,15 +1,25 @@
 <script lang="ts" src="./App.ts"></script>
 
 <template>
+<div class="container">
 	<slider
-		:dots="true"
-		:arrows="true"
+			:dots="true"
+			:arrows="true"
+			:slidesSwipe="true"
+			:slidesToShow="5"
+			:slidesToScroll="2"
+			:marginBetweenSlides="40"
 	>
 		<div class="slide">1</div>
 		<div class="slide">2</div>
 		<div class="slide">3</div>
 		<div class="slide">4</div>
+		<div class="slide">5</div>
+		<div class="slide">6</div>
+		<div class="slide">7</div>
+		<div class="slide">8</div>
 	</slider>
+</div>
 </template>
 
 <style lang="scss">
@@ -34,7 +44,10 @@
 	border: 1px solid black;
 	box-sizing: border-box;
 }
-
+.container {
+	padding: 15px;
+	overflow: hidden;
+}
 #nav {
   padding: 30px;
 
