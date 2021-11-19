@@ -36,7 +36,7 @@
 						class="slider__dots-item"
 						:key="n"
 						:class="{active: n-1 === currentIndex}"
-						@click="setSlide($event, n-1)"
+						@click="setSlide(n-1)"
 
 				></li>
 			</ul>
@@ -44,8 +44,8 @@
 			<div
 					@pointerdown="mouseDownHandler($event)"
 					@pointermove="mouseMoveHandler($event)"
-					@pointerleave="resetActions($event)"
-					@pointerup="resetActions($event)"
+					@pointerleave="resetActions()"
+					@pointerup="resetActions()"
 					class="slider__wrapper"
 					ref="sliderWrapper"
 					:style="`transform: translateX(-${currentPosition}px)`"
