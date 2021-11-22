@@ -18,10 +18,12 @@ export default class Slider extends Vue {
 	@Prop({default: 1}) public slidesToShow!: number;
 	/** По сколько слайдов пролистывать за раз */
 	@Prop({default: 1}) public slidesToScroll!: number;
-	/** Свободный режим при ручном перетаскивании нет привязки к шагу слайдера*/
+	/** Свободный режим при ручном перетаскивании нет привязки к шагу слайдера */
 	@Prop({default: false}) public freeMode!: boolean;
 	/** Расстояние между слайдами */
 	@Prop({default: 0}) public marginBetweenSlides!: number;
+	/** Настройки слайдера под маленькие экраны*/
+	@Prop({default: {}}) public breakpoints!: any;
 
 	/** Общее количество слайдов */
 	public slidesCount            = 0;
@@ -44,6 +46,13 @@ export default class Slider extends Vue {
 		this.calcSliderStep();
 		this.init();
 		this.getSlidesCount();
+		console.log(this.breakpoints)
+		window.addEventListener('resize', () => {
+			this.calcSliderStep();
+			if (window.innerWidth <=1200 && window.innerWidth > 992) {
+				this.arrows = this.breakpoints[1200].arrows
+			}
+		})
 	}
 
 	//TODO slideNext, slidePrev, setSlide объеденить в одну перменную
@@ -52,8 +61,6 @@ export default class Slider extends Vue {
 	//TODO проверить на мобилке
 
 	public init(): void {
-		const slider: HTMLElement = <HTMLElement>this.$refs.slider;
-		slider.style.marginRight  = `-${this.marginBetweenSlides}px`
 		Array.from(this.sliderWrapper.children).forEach((item: Element) => {
 			const slide = document.createElement('div');
 			slide.classList.add('slider__slide-item');
@@ -73,7 +80,9 @@ export default class Slider extends Vue {
 	 */
 	public get maxSlidePosition(): number {
 		if (this.sliderWrapper.firstElementChild) {
-			return ((this.slidesCount - this.slidesToShow) * (parseInt(getComputedStyle(this.sliderWrapper.firstElementChild).width) + this.marginBetweenSlides))
+			return ((this.slidesCount - this.slidesToShow) *
+				(parseInt(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
+				this.marginBetweenSlides))
 		}
 		else return 0;
 	}
@@ -114,7 +123,7 @@ export default class Slider extends Vue {
 	 */
 	public calcSliderStep(): void {
 		if (this.sliderWrapper.firstElementChild) {
-			this.sliderStep = (parseInt(getComputedStyle(this.sliderWrapper.firstElementChild).width)) / this.slidesToShow * this.slidesToScroll;
+			this.sliderStep = Math.round((parseInt(getComputedStyle(this.sliderWrapper).width)) / this.slidesToShow * this.slidesToScroll);
 		}
 	}
 
@@ -130,7 +139,6 @@ export default class Slider extends Vue {
 		if (this.currentPosition >= this.maxSlidePosition) {
 			this.currentPosition = this.maxSlidePosition;
 		}
-
 	}
 
 	/**

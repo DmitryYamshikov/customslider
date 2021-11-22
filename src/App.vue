@@ -7,8 +7,9 @@
 			:arrows="true"
 			:freeMode="false"
 			:slidesToShow="5"
-			:slidesToScroll="2"
-			:marginBetweenSlides="40"
+			:slidesToScroll="1"
+			:marginBetweenSlides="10"
+      :breakpoints="breakpoints"
 	>
 		<div class="slide">1</div>
 		<div class="slide">2</div>

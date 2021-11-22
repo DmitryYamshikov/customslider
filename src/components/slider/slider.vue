@@ -22,7 +22,7 @@
 						class="slider__btn slider__btn_next"
 						ref="sliderBtnNext"
 						@click.stop="slideNext($event)"
-						:style="{right: marginBetweenSlides + 12 + 'px'}"
+						:style="{right: 12 + 'px'}"
 				>
 					<svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path fill-rule="evenodd" clip-rule="evenodd" d="M0.973576 1.03968C1.26647 0.746784 1.74134 0.746784 2.03424 1.03968L8.46424 7.46968C8.60489 7.61033 8.68391 7.80109 8.68391 8.00001C8.68391 8.19892 8.60489 8.38969 8.46424 8.53034L2.03424 14.9603C1.74134 15.2532 1.26647 15.2532 0.973576 14.9603C0.680683 14.6674 0.680683 14.1926 0.973576 13.8997L6.87325 8.00001L0.973576 2.10034C0.680683 1.80744 0.680683 1.33257 0.973576 1.03968Z" fill="#8C8C8C"/>
@@ -41,17 +41,19 @@
 				></li>
 			</ul>
 
-			<div
-					@pointerdown="mouseDownHandler($event)"
-					@pointermove="mouseMoveHandler($event)"
-					@pointerleave="resetActions()"
-					@pointerup="resetActions()"
-					class="slider__wrapper"
-					ref="sliderWrapper"
-					:style="`transform: translateX(-${currentPosition}px)`"
-			>
-				<slot></slot>
-			</div>
+      <div class="slider__slides" :style="`margin-right: -${marginBetweenSlides}px`">
+        <div
+            @pointerdown="mouseDownHandler($event)"
+            @pointermove="mouseMoveHandler($event)"
+            @pointerleave="resetActions()"
+            @pointerup="resetActions()"
+            class="slider__wrapper"
+            ref="sliderWrapper"
+            :style="`transform: translateX(-${currentPosition}px)`"
+        >
+          <slot></slot>
+        </div>
+      </div>
 
 		</div>
 </template>
