@@ -1,5 +1,6 @@
 import {Options, Vue} from 'vue-class-component';
 import {Prop} from 'vue-property-decorator';
+import sliderParams from './sliderParams'
 import './slider.scss';
 
 /**
@@ -22,9 +23,17 @@ export default class Slider extends Vue {
 	@Prop({default: false}) public freeMode!: boolean;
 	/** Расстояние между слайдами */
 	@Prop({default: 0}) public marginBetweenSlides!: number;
-	/** Настройки слайдера под маленькие экраны*/
+	/** Настройки слайдера под маленькие экраны */
 	@Prop({default: {}}) public breakpoints!: any;
+	/** Размер стрелок big/small */
+	@Prop({default: 'big'}) public arrowSize!: string;
+	/** Положение точек left/center/right */
+	@Prop({default: 'left'}) public dotsPos!: string;
+	/** Переодичность автоматического перелистывания */
+	@Prop({default: 0}) public timer!: number;
 
+	/** Настройки слайдера */
+	public params: sliderParams   = {};
 	/** Общее количество слайдов */
 	public slidesCount            = 0;
 	/** Текущий индекс(шаг) слайдера */
@@ -41,34 +50,87 @@ export default class Slider extends Vue {
 	public isEventTouchWork       = false;
 	/** Разница между стартовым положением курсора и конечным при перетаскивании слайда */
 	public coordinatesXDifference = 0;
+	/** Максимальное смещение слайдов по оси X */
+	public maxSlidePosition       = 0;
 
 	mounted(): void {
+		this.setParams();
 		this.calcSliderStep();
 		this.init();
 		this.getSlidesCount();
-		console.log(this.breakpoints)
+		this.calcMaxSlidePosition();
+
 		window.addEventListener('resize', () => {
+			this.setParams();
 			this.calcSliderStep();
-			if (window.innerWidth <=1200 && window.innerWidth > 992) {
-				this.arrows = this.breakpoints[1200].arrows
-			}
+			this.calcMaxSlidePosition();
+
 		})
+
+		this.setTimerSlide();
 	}
 
-	//TODO slideNext, slidePrev, setSlide объеденить в одну перменную
-	//TODO сделать breakpoints
-	//TODO делать новую инизиализацию при изменении экрана
-	//TODO проверить на мобилке
+	public setParams(): void {
+		const prop  = Object.entries(this.$props).filter(item => item[0] !== 'breakpoints');
+
+		this.params = {...Object.fromEntries(prop)};
+
+		if (window.innerWidth <= 1200 && window.innerWidth > 992) {
+			this.params = {...this.params, ...this.breakpoints[1200]};
+		}
+		if (window.innerWidth <= 992 && window.innerWidth > 768) {
+			this.params = {...this.params, ...this.breakpoints[992]};
+		}
+		if (window.innerWidth <= 768 && window.innerWidth > 576) {
+			this.params = {...this.params, ...this.breakpoints[768]};
+		}
+		if (window.innerWidth <= 576) {
+			this.params = {...this.params, ...this.breakpoints[576]};
+		}
+
+		const slides = document.querySelectorAll('[data-name="slide"]');
+
+		if (slides) {
+			slides.forEach((item: any) => {
+				if (this.params.slidesToShow) {
+					item.style.width       = `calc(${100 / this.params.slidesToShow}% - ${this.params.marginBetweenSlides}px)`;
+					item.style.marginRight = `${this.params.marginBetweenSlides}px`;
+				}
+			});
+		}
+	}
 
 	public init(): void {
+		this.setParams();
 		Array.from(this.sliderWrapper.children).forEach((item: Element) => {
 			const slide = document.createElement('div');
 			slide.classList.add('slider__slide-item');
 			slide.appendChild(item);
+			slide.setAttribute('data-name', 'slide');
 			this.sliderWrapper.appendChild(slide);
-			slide.style.width       = `calc(${100 / this.slidesToShow}% - ${this.marginBetweenSlides}px)`;
-			slide.style.marginRight = `${this.marginBetweenSlides}px`
-		})
+			if (this.params.slidesToShow) {
+				slide.style.width       = `calc(${100 / this.params.slidesToShow}% - ${this.params.marginBetweenSlides}px)`;
+				slide.style.marginRight = `${this.params.marginBetweenSlides}px`;
+			}
+		});
+	}
+
+	/**
+	 * Устанавливаем таймер для автоматического перелистывания
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
+	public setTimerSlide() {
+		if (this.params.timer) {
+			setInterval(() => {
+				if (this.currentPosition === this.maxSlidePosition) {
+					this.setSlide(0);
+
+					return;
+				}
+				this.slideNext();
+			}, this.params.timer);
+		}
 	}
 
 	/**
@@ -78,13 +140,13 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public get maxSlidePosition(): number {
-		if (this.sliderWrapper.firstElementChild) {
-			return ((this.slidesCount - this.slidesToShow) *
-				(parseInt(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
-				this.marginBetweenSlides))
+	public calcMaxSlidePosition(): void {
+		if (this.sliderWrapper.firstElementChild && this.params.slidesToShow && this.params.marginBetweenSlides) {
+			this.maxSlidePosition = ((this.slidesCount - this.params.slidesToShow) *
+				(parseFloat(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
+					this.params.marginBetweenSlides));
 		}
-		else return 0;
+		else this.maxSlidePosition = 0;
 	}
 
 	/**
@@ -113,7 +175,10 @@ export default class Slider extends Vue {
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
 	public get dotsCount(): number {
-		return Math.ceil(Math.abs(((this.slidesCount - this.slidesToShow) / this.slidesToScroll) + 1))
+		if (this.params.slidesToShow && this.params.slidesToScroll) {
+			return Math.ceil(Math.abs(((this.slidesCount - this.params.slidesToShow) / this.params.slidesToScroll) + 1));
+		}
+		else return 0;
 	}
 
 	/**
@@ -122,8 +187,8 @@ export default class Slider extends Vue {
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
 	public calcSliderStep(): void {
-		if (this.sliderWrapper.firstElementChild) {
-			this.sliderStep = Math.round((parseInt(getComputedStyle(this.sliderWrapper).width)) / this.slidesToShow * this.slidesToScroll);
+		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
+			this.sliderStep = (parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow * this.params.slidesToScroll);
 		}
 	}
 
@@ -200,7 +265,7 @@ export default class Slider extends Vue {
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
 	public mouseDownHandler(event: PointerEvent): void {
-		this.sliderWrapper.classList.remove('anim')
+		this.sliderWrapper.classList.remove('anim');
 		this.eventClientX     = event.clientX;
 		this.isEventTouchWork = true;
 		this.posInStartEvent  = this.currentPosition;

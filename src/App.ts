@@ -12,12 +12,26 @@ export default class App extends Vue {
 			dots: false,
 			arrows: false,
 			freeMode: false,
-			slidesToShow: 5,
-			slidesToScroll: 1,
+			slidesToShow: 4,
+			slidesToScroll: 2,
 			marginBetweenSlides: 10,
 		},
-		992: {},
-		768: {},
-		576: {}
+		992: {
+			slidesToShow: 3,
+			slidesToScroll: 3,
+			dots: true,
+			arrows: true,
+			marginBetweenSlides: 50,
+		},
+		768: {
+			slidesToShow: 2,
+			dots: true,
+			arrows: true,
+		},
+		576: {
+			slidesToShow: 1,
+			dots: true,
+			arrows: true,
+		}
 	}
 }

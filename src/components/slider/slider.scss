@@ -1,8 +1,8 @@
 .slider {
-	width:    100%;
+	width:     100%;
 	max-width: 100%;
-	position: relative;
-	overflow: hidden;
+	position:  relative;
+	overflow:  hidden;
 
 	&__wrapper {
 		display:  flex;
@@ -22,14 +22,12 @@
 		display:         flex;
 		align-items:     center;
 		justify-content: center;
-		width:           48px;
-		height:          48px;
 		border-radius:   100%;
 		position:        absolute;
 		top:             50%;
 		transform:       translateY(-50%);
 		background:      #FFFFFF;
-		box-shadow:      0px 4px 10px rgba(0, 0, 0, .1);
+		box-shadow:      0 4px 10px rgba(0, 0, 0, .1);
 		transition:      all .2s ease;
 		cursor:          pointer;
 		z-index:         100;
@@ -40,12 +38,35 @@
 		}
 
 		&:hover {
-			width:      52px;
-			height:     52px;
-			box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
 			svg path {
 				fill: #4E4E4E;
+			}
+		}
+
+		&_big {
+			width:  48px;
+			height: 48px;
+
+			&:hover {
+				width:  52px;
+				height: 52px;
+			}
+		}
+
+		&_small {
+			width:  28px;
+			height: 28px;
+
+			svg {
+				width:  5px;
+				height: 10px;
+			}
+
+			&:hover {
+				width:  32px;
+				height: 32px;
 			}
 		}
 
@@ -76,8 +97,6 @@
 	&__dots {
 		position:        absolute;
 		bottom:          10px;
-		left:            50%;
-		transform:       translateX(-50%);
 		display:         flex;
 		align-items:     center;
 		justify-content: center;
@@ -85,6 +104,19 @@
 		padding:         0;
 		list-style-type: none;
 		z-index:         100;
+
+		&_left {
+			left: 12px;
+		}
+
+		&_center {
+			left:      50%;
+			transform: translateX(-50%);
+		}
+
+		&_right {
+			right: 12px;
+		}
 	}
 
 	&__dots-item {

@@ -6,12 +6,13 @@
 			ref="slider"
 		>
 
-			<div class="slider__arrows">
+			<div class="slider__arrows" v-if="params.arrows">
 				<button
 						:disabled="currentIndex === 0"
+						:class="`slider__btn_${params.arrowSize}`"
 						class="slider__btn slider__btn_prev"
 						ref="sliderBtnPrev"
-						@click.self="slidePrev($event)"
+						@click.self="slidePrev()"
 				>
 					<svg width="8" height="16" viewBox="0 0 8 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path fill-rule="evenodd" clip-rule="evenodd" d="M7.74549 1.03968C8.03838 1.33257 8.03838 1.80744 7.74549 2.10034L1.84582 8.00001L7.74549 13.8997C8.03838 14.1926 8.03838 14.6674 7.74549 14.9603C7.45259 15.2532 6.97772 15.2532 6.68483 14.9603L0.254826 8.53034C0.114174 8.38969 0.0351562 8.19892 0.0351562 8.00001C0.0351562 7.80109 0.114174 7.61033 0.254826 7.46968L6.68483 1.03968C6.97772 0.746784 7.45259 0.746784 7.74549 1.03968Z" fill="#8C8C8C"/>
@@ -19,9 +20,10 @@
 				</button>
 				<button
 						:disabled="currentIndex === dotsCount-1"
+						:class="`slider__btn_${params.arrowSize}`"
 						class="slider__btn slider__btn_next"
 						ref="sliderBtnNext"
-						@click.stop="slideNext($event)"
+						@click.stop="slideNext()"
 						:style="{right: 12 + 'px'}"
 				>
 					<svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,7 +32,12 @@
 				</button>
 			</div>
 
-			<ul class="slider__dots" ref="sliderDots" v-if="dots">
+			<ul
+				:class="`slider__dots_${params.dotsPos}`"
+				class="slider__dots"
+				ref="sliderDots"
+				v-if="params.dots"
+			>
 				<li
 						v-for="n in dotsCount"
 						class="slider__dots-item"
@@ -41,7 +48,7 @@
 				></li>
 			</ul>
 
-      <div class="slider__slides" :style="`margin-right: -${marginBetweenSlides}px`">
+      <div class="slider__slides" :style="`margin-right: -${params.marginBetweenSlides}px`">
         <div
             @pointerdown="mouseDownHandler($event)"
             @pointermove="mouseMoveHandler($event)"
