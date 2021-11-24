@@ -55,8 +55,8 @@ export default class Slider extends Vue {
 
 	mounted(): void {
 		this.setParams();
-		this.calcSliderStep();
 		this.init();
+		this.calcSliderStep();
 		this.getSlidesCount();
 		this.calcMaxSlidePosition();
 
@@ -70,6 +70,11 @@ export default class Slider extends Vue {
 		this.setTimerSlide();
 	}
 
+	/**
+	 * Высталяем параметры слайдера на основании props и ширины экрана
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
 	public setParams(): void {
 		const prop  = Object.entries(this.$props).filter(item => item[0] !== 'breakpoints');
 
@@ -88,7 +93,7 @@ export default class Slider extends Vue {
 			this.params = {...this.params, ...this.breakpoints[576]};
 		}
 
-		const slides = document.querySelectorAll('[data-name="slide"]');
+		const slides = this.sliderWrapper.querySelectorAll('[data-name="slide"]');
 
 		if (slides) {
 			slides.forEach((item: any) => {
@@ -100,14 +105,20 @@ export default class Slider extends Vue {
 		}
 	}
 
+	/**
+	 * первичная настройка сладов и их размеров
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
 	public init(): void {
-		this.setParams();
 		Array.from(this.sliderWrapper.children).forEach((item: Element) => {
 			const slide = document.createElement('div');
+
 			slide.classList.add('slider__slide-item');
 			slide.appendChild(item);
 			slide.setAttribute('data-name', 'slide');
 			this.sliderWrapper.appendChild(slide);
+
 			if (this.params.slidesToShow) {
 				slide.style.width       = `calc(${100 / this.params.slidesToShow}% - ${this.params.marginBetweenSlides}px)`;
 				slide.style.marginRight = `${this.params.marginBetweenSlides}px`;
@@ -120,7 +131,7 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public setTimerSlide() {
+	public setTimerSlide(): void {
 		if (this.params.timer) {
 			setInterval(() => {
 				if (this.currentPosition === this.maxSlidePosition) {
@@ -188,7 +199,8 @@ export default class Slider extends Vue {
 	 */
 	public calcSliderStep(): void {
 		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
-			this.sliderStep = (parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow * this.params.slidesToScroll);
+			this.sliderStep = ((parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow) * this.params.slidesToScroll);
+			console.log(parseFloat(getComputedStyle(this.sliderWrapper).width))
 		}
 	}
 
@@ -280,10 +292,11 @@ export default class Slider extends Vue {
 	 */
 	public mouseMoveHandler(event: PointerEvent): void {
 		if (this.isEventTouchWork) {
+			// разница между начальной точки движения курсора и последующей
 			this.coordinatesXDifference = this.eventClientX - event.clientX;
 			const newPosition           = this.posInStartEvent + this.coordinatesXDifference;
 
-
+			// проверяем не вытащили ли слайды за пределы нулевого или максимального положения
 			if ((newPosition >= 0) && (newPosition <= this.maxSlidePosition)) {
 				this.currentPosition = newPosition;
 				if (!this.freeMode) {

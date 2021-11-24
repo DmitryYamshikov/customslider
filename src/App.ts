@@ -30,8 +30,9 @@ export default class App extends Vue {
 		},
 		576: {
 			slidesToShow: 1,
-			dots: true,
+			dots: false,
 			arrows: true,
+			marginBetweenSlides: 50,
 		}
 	}
 }

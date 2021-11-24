@@ -2,7 +2,10 @@
 	width:     100%;
 	max-width: 100%;
 	position:  relative;
-	overflow:  hidden;
+
+	&__slides {
+		overflow: hidden;
+	}
 
 	&__wrapper {
 		display:  flex;

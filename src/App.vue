@@ -5,7 +5,7 @@
 		<slider
 				:dots="true"
 				:arrows="true"
-				:freeMode="false"
+				:freeMode="true"
 				:slidesToShow="5"
 				:slidesToScroll="1"
 				:marginBetweenSlides="10"
