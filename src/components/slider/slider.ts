@@ -59,15 +59,17 @@ export default class Slider extends Vue {
 		this.calcSliderStep();
 		this.getSlidesCount();
 		this.calcMaxSlidePosition();
+		if (this.sliderWrapper.firstElementChild) {console.dir(this.sliderWrapper.firstElementChild)}
 
 		window.addEventListener('resize', () => {
 			this.setParams();
+			this.setMarginToSlides();
 			this.calcSliderStep();
 			this.calcMaxSlidePosition();
-
 		})
 
 		this.setTimerSlide();
+		if (this.sliderWrapper.firstElementChild) {console.log(this.sliderWrapper.firstElementChild.clientWidth)}
 	}
 
 	/**
@@ -92,7 +94,9 @@ export default class Slider extends Vue {
 		if (window.innerWidth <= 576) {
 			this.params = {...this.params, ...this.breakpoints[576]};
 		}
+	}
 
+	public setMarginToSlides() {
 		const slides = this.sliderWrapper.querySelectorAll('[data-name="slide"]');
 
 		if (slides) {
@@ -104,7 +108,6 @@ export default class Slider extends Vue {
 			});
 		}
 	}
-
 	/**
 	 * первичная настройка сладов и их размеров
 	 *
@@ -152,10 +155,12 @@ export default class Slider extends Vue {
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
 	public calcMaxSlidePosition(): void {
-		if (this.sliderWrapper.firstElementChild && this.params.slidesToShow && this.params.marginBetweenSlides) {
+		if (this.sliderWrapper.firstElementChild) {console.log(this.sliderWrapper.firstElementChild.clientWidth)}
+		if (this.sliderWrapper.firstElementChild && this.params.slidesToShow && (this.params.marginBetweenSlides !== undefined)) {
 			this.maxSlidePosition = ((this.slidesCount - this.params.slidesToShow) *
 				(parseFloat(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
 					this.params.marginBetweenSlides));
+			if (this.sliderWrapper.firstElementChild) {console.log(getComputedStyle(this.sliderWrapper.firstElementChild).width)}
 		}
 		else this.maxSlidePosition = 0;
 	}
@@ -200,7 +205,6 @@ export default class Slider extends Vue {
 	public calcSliderStep(): void {
 		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
 			this.sliderStep = ((parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow) * this.params.slidesToScroll);
-			console.log(parseFloat(getComputedStyle(this.sliderWrapper).width))
 		}
 	}
 
@@ -253,7 +257,7 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public resetActions(): void {
+	public resetActions(event: PointerEvent): void {
 		this.isEventTouchWork = false;
 
 		if (!this.freeMode) {
