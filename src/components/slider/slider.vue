@@ -48,22 +48,30 @@
 				></li>
 			</ul>
 
-      <div class="slider__slides" :style="`margin-right: -${params.marginBetweenSlides}px`">
-        <div
-            @pointerdown="mouseDownHandler($event)"
-            @pointermove="mouseMoveHandler($event)"
-            @pointerleave="resetActions()"
-            @pointerup="resetActions()"
-            class="slider__wrapper"
-            ref="sliderWrapper"
-            :style="`transform: translateX(-${currentPosition}px)`"
-        >
-          <slot></slot>
-        </div>
-      </div>
+			<div class="slider__slides" :style="`margin-right: -${params.marginBetweenSlides}px`">
+				<div
+						@pointerdown="mouseDownHandler($event)"
+						@pointermove="mouseMoveHandler($event)"
+						@pointerleave="resetActions($event)"
+						@pointerup="resetActions($event)"
+
+
+					class="slider__wrapper"
+					ref="sliderWrapper"
+					:style="`transform: translateX(-${currentPosition}px)`"
+				>
+					<slot></slot>
+				</div>
+			</div>
 
 		</div>
 </template>
 
+<!--@pointerdown="mouseDownHandler($event)"-->
+<!--@pointermove="mouseMoveHandler($event)"-->
+<!--@pointerleave="resetActions()"-->
+<!--@pointerup="resetActions()"-->
 
-
+<!--@touchstart="mouseDownHandler($event)"-->
+<!--@touchmove="mouseMoveHandler($event)"-->
+<!--@touchcancel="resetActions()"-->

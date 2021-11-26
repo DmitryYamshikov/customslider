@@ -3,16 +3,16 @@
 <template>
 	<div class="container">
 		<slider
-				:dots="true"
-				:arrows="true"
-				:freeMode="true"
-				:slidesToShow="5"
-				:slidesToScroll="1"
-				:marginBetweenSlides="10"
-				:breakpoints="breakpoints"
-				:arrowSize="'big'"
-				:dotsPos="'right'"
-				:timer="0"
+			:dots="true"
+			:arrows="true"
+			:freeMode="true"
+			:slidesToShow="5"
+			:slidesToScroll="1"
+			:marginBetweenSlides="100"
+			:breakpoints="breakpoints"
+			:arrowSize="'big'"
+			:dotsPos="'right'"
+			:timer="0"
 		>
 			<div class="slide">1</div>
 			<div class="slide">2</div>

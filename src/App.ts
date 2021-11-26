@@ -9,8 +9,8 @@ import {Options, Vue} from 'vue-class-component';
 export default class App extends Vue {
 	public breakpoints = {
 		1200: {
-			dots: false,
-			arrows: false,
+			dots: true,
+			arrows: true,
 			freeMode: false,
 			slidesToShow: 4,
 			slidesToScroll: 2,
@@ -27,12 +27,13 @@ export default class App extends Vue {
 			slidesToShow: 2,
 			dots: true,
 			arrows: true,
+
 		},
 		576: {
-			slidesToShow: 1,
-			dots: false,
-			arrows: true,
-			marginBetweenSlides: 50,
+			slidesToShow: 2,
+			dots: true,
+			arrows: false,
+			marginBetweenSlides: 10,
 		}
 	}
 }
