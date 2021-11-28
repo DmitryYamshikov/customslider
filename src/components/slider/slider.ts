@@ -54,14 +54,21 @@ export default class Slider extends Vue {
 	public maxSlidePosition       = 0;
 
 	mounted(): void {
+		// new Promise(this.setParams)
+		// 	.then(this.setParams)
+		// 	.then(this.init)
+		// 	.then(this.getSlidesCount)
+		// 	.then(this.calcSliderStep)
+		// 	.then(this.calcMaxSlidePosition)
 		this.setParams();
 		this.init();
-		this.calcSliderStep();
 		this.getSlidesCount();
+		this.calcSliderStep();
 		this.calcMaxSlidePosition();
 		if (this.sliderWrapper.firstElementChild) {console.dir(this.sliderWrapper.firstElementChild)}
 
 		window.addEventListener('resize', () => {
+			this.setSlide(0);
 			this.setParams();
 			this.setMarginToSlides();
 			this.calcSliderStep();
@@ -96,7 +103,7 @@ export default class Slider extends Vue {
 		}
 	}
 
-	public setMarginToSlides() {
+	public setMarginToSlides(): void {
 		const slides = this.sliderWrapper.querySelectorAll('[data-name="slide"]');
 
 		if (slides) {
@@ -312,6 +319,9 @@ export default class Slider extends Vue {
 						this.isEventTouchWork = false;
 						this.slidePrev();
 					}
+				}
+				if (this.freeMode) {
+					this.currentIndex = Math.round(this.currentPosition / this.sliderStep);
 				}
 			}
 		}
