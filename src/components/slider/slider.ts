@@ -40,8 +40,6 @@ export default class Slider extends Vue {
 	public currentIndex           = 0;
 	/** Текущее значение position обложки слайдов */
 	public currentPosition        = 0;
-	/** Шаг слайда ( на сколько меняется position) */
-	public sliderStep             = 0;
 	/** Начальная координата X указателя при срабатывании pointerDown */
 	public eventClientX           = 0;
 	/** Значение position перед перетаскиванием слайдо мышью/пальцем */
@@ -50,33 +48,73 @@ export default class Slider extends Vue {
 	public isEventTouchWork       = false;
 	/** Разница между стартовым положением курсора и конечным при перетаскивании слайда */
 	public coordinatesXDifference = 0;
-	/** Максимальное смещение слайдов по оси X */
-	public maxSlidePosition       = 0;
 
 	mounted(): void {
-		// new Promise(this.setParams)
-		// 	.then(this.setParams)
-		// 	.then(this.init)
-		// 	.then(this.getSlidesCount)
-		// 	.then(this.calcSliderStep)
-		// 	.then(this.calcMaxSlidePosition)
 		this.setParams();
 		this.init();
+		this.setMarginToSlides();
 		this.getSlidesCount();
-		this.calcSliderStep();
-		this.calcMaxSlidePosition();
-		if (this.sliderWrapper.firstElementChild) {console.dir(this.sliderWrapper.firstElementChild)}
 
 		window.addEventListener('resize', () => {
 			this.setSlide(0);
 			this.setParams();
 			this.setMarginToSlides();
-			this.calcSliderStep();
-			this.calcMaxSlidePosition();
 		})
 
 		this.setTimerSlide();
-		if (this.sliderWrapper.firstElementChild) {console.log(this.sliderWrapper.firstElementChild.clientWidth)}
+	}
+
+	/**
+	 * Получаем шаг слайдера
+	 *
+	 * @return {number}
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
+	public get sliderStep(): number {
+		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
+			return ((parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow) * this.params.slidesToScroll);
+		}
+		else return 0;
+	}
+
+	/**
+	 * Получает максимально возможное смещение обложки слайдов по оси X
+	 *
+	 * @return {number}
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
+	public get maxPos(): number {
+		if (this.sliderWrapper.firstElementChild && this.params.slidesToShow && (this.params.marginBetweenSlides !== undefined)) {
+			return ((this.slidesCount - this.params.slidesToShow) *
+				(parseFloat(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
+				this.params.marginBetweenSlides));
+		}
+		else return 0;
+	}
+
+	/**
+	 * Получение из DOM обложки слайдов
+	 *
+	 * @return {HTMLElement}
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
+	public get sliderWrapper(): HTMLElement {
+		return <HTMLElement>this.$refs.sliderWrapper;
+	}
+
+	/**
+	 * Получаем кол-во точек для их отрисовки
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
+	public get dotsCount(): number {
+		if (this.params.slidesToShow && this.params.slidesToScroll) {
+			return Math.ceil(Math.abs(((this.slidesCount - this.params.slidesToShow) / this.params.slidesToScroll) + 1));
+		}
+		else return 0;
 	}
 
 	/**
@@ -85,7 +123,7 @@ export default class Slider extends Vue {
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
 	public setParams(): void {
-		const prop  = Object.entries(this.$props).filter(item => item[0] !== 'breakpoints');
+		const prop = Object.entries(this.$props).filter(item => item[0] !== 'breakpoints');
 
 		this.params = {...Object.fromEntries(prop)};
 
@@ -103,6 +141,11 @@ export default class Slider extends Vue {
 		}
 	}
 
+	/**
+	 * Высталяем отступы для слайдов при их наличии
+	 *
+	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
+	 */
 	public setMarginToSlides(): void {
 		const slides = this.sliderWrapper.querySelectorAll('[data-name="slide"]');
 
@@ -115,8 +158,9 @@ export default class Slider extends Vue {
 			});
 		}
 	}
+
 	/**
-	 * первичная настройка сладов и их размеров
+	 * Первичная настройка слайдов и их размеров
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
@@ -128,11 +172,6 @@ export default class Slider extends Vue {
 			slide.appendChild(item);
 			slide.setAttribute('data-name', 'slide');
 			this.sliderWrapper.appendChild(slide);
-
-			if (this.params.slidesToShow) {
-				slide.style.width       = `calc(${100 / this.params.slidesToShow}% - ${this.params.marginBetweenSlides}px)`;
-				slide.style.marginRight = `${this.params.marginBetweenSlides}px`;
-			}
 		});
 	}
 
@@ -144,7 +183,7 @@ export default class Slider extends Vue {
 	public setTimerSlide(): void {
 		if (this.params.timer) {
 			setInterval(() => {
-				if (this.currentPosition === this.maxSlidePosition) {
+				if (this.currentPosition === this.maxPos) {
 					this.setSlide(0);
 
 					return;
@@ -152,35 +191,6 @@ export default class Slider extends Vue {
 				this.slideNext();
 			}, this.params.timer);
 		}
-	}
-
-	/**
-	 * Получает максимально возможное смещение обложки слайдов по оси X
-	 *
-	 * @return {number}
-	 *
-	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
-	 */
-	public calcMaxSlidePosition(): void {
-		if (this.sliderWrapper.firstElementChild) {console.log(this.sliderWrapper.firstElementChild.clientWidth)}
-		if (this.sliderWrapper.firstElementChild && this.params.slidesToShow && (this.params.marginBetweenSlides !== undefined)) {
-			this.maxSlidePosition = ((this.slidesCount - this.params.slidesToShow) *
-				(parseFloat(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
-					this.params.marginBetweenSlides));
-			if (this.sliderWrapper.firstElementChild) {console.log(getComputedStyle(this.sliderWrapper.firstElementChild).width)}
-		}
-		else this.maxSlidePosition = 0;
-	}
-
-	/**
-	 * Получение из DOM обложки слайдов
-	 *
-	 * @return {HTMLElement}
-	 *
-	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
-	 */
-	public get sliderWrapper(): HTMLElement {
-		return <HTMLElement>this.$refs.sliderWrapper;
 	}
 
 	/**
@@ -193,29 +203,6 @@ export default class Slider extends Vue {
 	}
 
 	/**
-	 * Получаем кол-во точек для их отрисовки
-	 *
-	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
-	 */
-	public get dotsCount(): number {
-		if (this.params.slidesToShow && this.params.slidesToScroll) {
-			return Math.ceil(Math.abs(((this.slidesCount - this.params.slidesToShow) / this.params.slidesToScroll) + 1));
-		}
-		else return 0;
-	}
-
-	/**
-	 * Высчитываем шаг слайдера
-	 *
-	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
-	 */
-	public calcSliderStep(): void {
-		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
-			this.sliderStep = ((parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow) * this.params.slidesToScroll);
-		}
-	}
-
-	/**
 	 * Листаем следующий слайд
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
@@ -224,8 +211,8 @@ export default class Slider extends Vue {
 		this.sliderWrapper.classList.add('anim');
 		this.currentIndex++;
 		this.currentPosition = this.sliderStep * this.currentIndex;
-		if (this.currentPosition >= this.maxSlidePosition) {
-			this.currentPosition = this.maxSlidePosition;
+		if (this.currentPosition >= this.maxPos) {
+			this.currentPosition = this.maxPos;
 		}
 	}
 
@@ -254,8 +241,8 @@ export default class Slider extends Vue {
 
 		/* Если при перелистывании слайдера справа остается пустое место,
 		 то сладер прибивается к правому краю*/
-		if (this.currentPosition >= this.maxSlidePosition) {
-			this.currentPosition = this.maxSlidePosition;
+		if (this.currentPosition >= this.maxPos) {
+			this.currentPosition = this.maxPos;
 		}
 	}
 
@@ -264,7 +251,7 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public resetActions(event: PointerEvent): void {
+	public resetActions(): void {
 		this.isEventTouchWork = false;
 
 		if (!this.freeMode) {
@@ -287,7 +274,7 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public mouseDownHandler(event: PointerEvent): void {
+	public pointerDownHandler(event: PointerEvent): void {
 		this.sliderWrapper.classList.remove('anim');
 		this.eventClientX     = event.clientX;
 		this.isEventTouchWork = true;
@@ -295,20 +282,20 @@ export default class Slider extends Vue {
 	}
 
 	/**
-	 * Событие движения мыши по сладеру. Указатель тянет за собой слайды.
+	 * Событие движения указателя по сладеру. Указатель тянет за собой слайды.
 	 *
 	 * @param {PointerEvent} event
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public mouseMoveHandler(event: PointerEvent): void {
+	public pointerMoveHandler(event: PointerEvent): void {
 		if (this.isEventTouchWork) {
 			// разница между начальной точки движения курсора и последующей
 			this.coordinatesXDifference = this.eventClientX - event.clientX;
 			const newPosition           = this.posInStartEvent + this.coordinatesXDifference;
 
 			// проверяем не вытащили ли слайды за пределы нулевого или максимального положения
-			if ((newPosition >= 0) && (newPosition <= this.maxSlidePosition)) {
+			if ((newPosition >= 0) && (newPosition <= this.maxPos)) {
 				this.currentPosition = newPosition;
 				if (!this.freeMode) {
 					if ((this.coordinatesXDifference >= 0) && ((this.sliderStep * 0.3) < Math.abs(this.coordinatesXDifference))) {
