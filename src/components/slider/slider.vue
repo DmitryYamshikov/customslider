@@ -52,8 +52,8 @@
 				<div
 					@pointerdown="pointerDownHandler($event)"
 					@pointermove="pointerMoveHandler($event)"
-					@pointerleave="resetActions($event)"
-					@pointerup="resetActions($event)"
+					@pointerleave="resetActions()"
+					@pointerup="resetActions()"
 					class="slider__wrapper"
 					ref="sliderWrapper"
 					:style="`transform: translateX(-${currentPosition}px)`"
