@@ -46,14 +46,14 @@ export default class Slider extends Vue {
 	public posInStartEvent        = 0;
 	/** Работает ли event перетакскивания слайдов */
 	public isEventTouchWork       = false;
-	/** Разница между стартовым положением курсора и конечным при перетаскивании слайда */
+	/** Разница между стартовым положением курсора и конечным при перетаскивании слайда по оси X*/
 	public coordinatesXDifference = 0;
 
 	mounted(): void {
 		this.setParams();
 		this.init();
 		this.setMarginToSlides();
-		this.getSlidesCount();
+		this.setSlidesCount();
 
 		window.addEventListener('resize', () => {
 			this.setSlide(0);
@@ -75,7 +75,8 @@ export default class Slider extends Vue {
 		if (this.sliderWrapper && this.params.slidesToShow && this.params.slidesToScroll) {
 			return ((parseFloat(getComputedStyle(this.sliderWrapper).width) / this.params.slidesToShow) * this.params.slidesToScroll);
 		}
-		else return 0;
+		
+		return 0;
 	}
 
 	/**
@@ -91,7 +92,8 @@ export default class Slider extends Vue {
 				(parseFloat(getComputedStyle(this.sliderWrapper.firstElementChild).width) +
 				this.params.marginBetweenSlides));
 		}
-		else return 0;
+		
+		return 0;
 	}
 
 	/**
@@ -114,7 +116,8 @@ export default class Slider extends Vue {
 		if (this.params.slidesToShow && this.params.slidesToScroll) {
 			return Math.ceil(Math.abs(((this.slidesCount - this.params.slidesToShow) / this.params.slidesToScroll) + 1));
 		}
-		else return 0;
+		
+		return 0;
 	}
 
 	/**
@@ -198,7 +201,7 @@ export default class Slider extends Vue {
 	 *
 	 * @author Ямщиков Дмитрий <Yamschikov.ds@dns-shop.ru>
 	 */
-	public getSlidesCount(): void {
+	public setSlidesCount(): void {
 		this.slidesCount = this.sliderWrapper.children.length;
 	}
 

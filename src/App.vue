@@ -5,14 +5,14 @@
 		<slider
 			:dots="true"
 			:arrows="true"
-			:freeMode="false"
+			:freeMode="true"
 			:slidesToShow="5"
 			:slidesToScroll="3"
 			:marginBetweenSlides="10"
 			:breakpoints="breakpoints"
 			:arrowSize="'big'"
 			:dotsPos="'right'"
-			:timer="2000"
+			:timer="0"
 		>
 			<div class="slide">1</div>
 			<div class="slide">2</div>
